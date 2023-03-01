@@ -1,17 +1,17 @@
 #!/bin/bash -ex
 
-# clean
-rm -rf *.mod *.o *.lst *.x
-
-# use gftl lib or local
-use_gftl=false   # internal gftl library
-#use_gftl=true   # external gftl library
-
-#mach='x86_64'
 mach=${1:-'fx1000'}
 
+#* clean
+rm -rf *.mod *.o *.lst *.x
+
+#* compile flags
 if [[ $mach == 'fx1000' ]] ; then
-  comp="frt -Ec -Nlst=a,lst=d,lst=i,lst=p,lst=t,lst=x -Nalloc_assign -Cpp"
+  if [[ $(hostname) =~ h6ln ]] ; then
+    comp="frtpx -Ec -Nlst=a,lst=d,lst=i,lst=p,lst=t,lst=x -Nalloc_assign -Cpp"
+  else
+    comp="frt -Ec -Nlst=a,lst=d,lst=i,lst=p,lst=t,lst=x -Nalloc_assign -Cpp"
+  fi
   lib_path='hpc_stack/fujitsu-1.2.33'
   gftl_lib=/users/xb80/opt/${lib_path}/gftl-shared/v1.3.0
 elif [[ $mach == 'x86_64' ]] ; then
@@ -19,21 +19,30 @@ elif [[ $mach == 'x86_64' ]] ; then
   gftl_lib=/users/xb80/opt/${mach}/gftl-shared-1.3.0
 fi
 
+#* external gftl library
+use_gftl=${use_gftl:-false}   
+  # false  : internal gftl library
+  # true   : external gftl library
 if $use_gftl ; then
   include="-I${gftl_lib}/GFTL_SHARED-1.3/include/v1 -I${gftl_lib}/GFTL-1.4/include/v1"
   lib="${gftl_lib}/GFTL_SHARED-1.3/lib/libgftl-shared-v1.a"
 fi
 
-# compile
+#* compile
 ${comp} ${include} -c String.F90
 ${comp} ${include} -c ArrayWrapper.F90
 $use_gftl || ${comp} ${include} -c UnlimitedVector.cpp.f90
 ${comp} ${include} -c UnlimitedUtilities.F90 
 ${comp} ${include} -c main.f90 
 
-# link
+#* link
 ${comp} *.o ${lib} -o main_${mach}.x
 
-# test
-./main_${mach}.x
-
+#* test
+if [[ $mach == 'fx1000' ]] ; then
+if [[ ! $(hostname) =~ h6 ]] ; then
+  ./main_${mach}.x
+fi
+elif [[ $mach == 'x86_64' ]] ; then
+  ./main_${mach}.x
+fi
