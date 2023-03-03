@@ -33,6 +33,32 @@ module fy_UnlimitedUtilities
 
 contains
 
+  ! 1) Copy the is_logical_scalar function and rename to is_logical_scalar_temp.
+  recursive logical function is_logical_scalar_temp(u) result(is_logical)
+    class(*), intent(in) :: u
+    type (UnlimitedVectorIterator) :: iter
+
+    select type (u)
+    type is (logical)
+       is_logical = .true.
+    type is (ArrayWrapper)
+       is_logical = is_logical_array(u%elements)
+    type is (UnlimitedVector)
+       is_logical = .true. ! unless
+       iter = u%begin()
+       do while (iter /= u%end())
+          ! Call the function is_logical_scalar here.
+          if (.not. is_logical_scalar(iter%get())) then
+             is_logical = .false.
+             return
+          end if
+          call iter%next()
+       end do
+    class default
+       is_logical = .false.
+    end select
+
+  end function is_logical_scalar_temp
 
   recursive logical function is_logical_scalar(u) result(is_logical)
     class(*), intent(in) :: u
@@ -47,7 +73,9 @@ contains
        is_logical = .true. ! unless
        iter = u%begin()
        do while (iter /= u%end())
-          if (.not. is_logical_scalar(iter%get())) then
+          !if (.not. is_logical_scalar(iter%get())) then
+          ! 2) Change the function name to is_logical_scalar_temp.
+          if (.not. is_logical_scalar_temp(iter%get())) then
              is_logical = .false.
              return
           end if

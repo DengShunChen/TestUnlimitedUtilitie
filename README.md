@@ -28,3 +28,19 @@ Fortran diagnostic messages: program name(fy_UnlimitedUtilities)
  Module subprogram name(is_logical_scalar)
   jwd2529i-s  "UnlimitedUtilities.F90", line 52, column 21: Derived type actual argument must have same type name, and type parameter values of actual argument must agree with the corresponding ones of the dummy argument that is not assumed or deferred, and same structure components as those of dummy argument 'is_logical_scalar'.
 ```
+
+### Support Team 
+
+*【Answer】*
+We have found out that the output of jwd2529i-s during translation of yafyaml-v0.5.1 is a problem in Fujitsu Fortran Compiler.
+The occurrence condition for this issue is still being investigated.
+We will let you know as soon as we find out.
+It cannot be avoided by options, etc., so please execute the workaround using the following program correction.
+
+*【Workaround】*
+Please execute all of these.
+1	Copy the definition (37th~60th lines) of is_logical_scalar function of UnlimitedUtilities.F90, 
+  Then change the function name in the destination to is_logical_scalar_temp.
+2	Change the is_logical_scalar function reference on line 50 of UnlimitedUtilities.F90
+  To the reference of is_logical_scalar_temp function.
+
