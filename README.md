@@ -32,15 +32,19 @@ Fortran diagnostic messages: program name(fy_UnlimitedUtilities)
 ### Support Team 
 
 *【Answer】*
+
 We have found out that the output of jwd2529i-s during translation of yafyaml-v0.5.1 is a problem in Fujitsu Fortran Compiler.
 The occurrence condition for this issue is still being investigated.
 We will let you know as soon as we find out.
 It cannot be avoided by options, etc., so please execute the workaround using the following program correction.
 
 *【Workaround】*
+
 Please execute all of these.
-1	Copy the definition (37th~60th lines) of is_logical_scalar function of UnlimitedUtilities.F90, 
+
+*	Copy the definition (37th~60th lines) of is_logical_scalar function of UnlimitedUtilities.F90, 
   Then change the function name in the destination to is_logical_scalar_temp.
-2	Change the is_logical_scalar function reference on line 50 of UnlimitedUtilities.F90
+
+*	Change the is_logical_scalar function reference on line 50 of UnlimitedUtilities.F90
   To the reference of is_logical_scalar_temp function.
 
